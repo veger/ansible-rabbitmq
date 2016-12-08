@@ -1,5 +1,5 @@
 rabbitmq
-======
+========
 
 This role configures RabbitMQ cluster. This playbook is derived from alexeymedvedchikov.rabbitmq but adds the ability to use FQDN.
 
@@ -15,6 +15,9 @@ Role Variables
 
 The variables that can be passed to this role and a brief description about
 them are as follows.
+
+	# RabbitMQ version to install, leave empty (default) when latest version  must be installed
+	rabbitmq_version: '3.6.6'
 
 	# Set /var/lib/rabbitmq/.erlang.cookie
 	rabbitmq_erlang_cookie: 1qa2ws3ed
@@ -52,8 +55,8 @@ them are as follows.
 	rabbitmq_users_removed:
 	  - guest
 
-       # Use FQDN
-       rabbitmq_use_longname: 'true'
+	# Use FQDN
+	rabbitmq_use_longname: 'true'
 
 Examples
 --------

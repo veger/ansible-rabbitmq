@@ -1,14 +1,32 @@
 ---
 # Install required packages
 
-- name: install required packages
+- name: install required packages via apt
   apt:
     update_cache: yes
     force: yes
-    pkg: "{{ item }}"
+    pkg: rabbitmq-server{{ (rabbitmq_version == '') | ternary('', '=' + rabbitmq_version + '-1') }}
     state: present
-  with_items:
-    - rabbitmq-server
+  register: rabbitmq_install_from_repo
+  ignore_errors: rabbitmq_version != ''
+
+  apt:
+    pkg: "rabbitmq-server{{ (rabbitmq_version == '') | ternary('', '=' + rabbitmq_version + '-1') }}"
+    state: present
+    force: yes
+
+- name: download rabbitmq-server deb from rabbitmq.com
+  get_url:
+    url: "https://www.rabbitmq.com/releases/rabbitmq-server/v{{ rabbitmq_version }}/rabbitmq-server_{{ rabbitmq_version }}-1_all.deb"
+    dest: "/var/cache/apt/archives/rabbitmq-server_{{ rabbitmq_version }}-1_all.deb"
+  when: rabbitmq_install_from_repo|failed
+
+- name: install rabbitmq-server deb from rabbitmq.com
+  apt:
+    deb: "/var/cache/apt/archives/rabbitmq-server_{{ rabbitmq_version }}-1_all.deb"
+    state: present
+    force: yes
+  when: rabbitmq_install_from_repo|failed
 
 - name: customize logrotate rules
   template:
